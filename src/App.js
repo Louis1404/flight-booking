@@ -3,6 +3,18 @@ import logo from './logo.svg';
 import './App.css';
 
 function App() {
+
+  const state = {
+    response: ''
+  };
+
+  const handleClick = buttonName => {
+
+    //TODO make a request
+    //set the response to the state
+  };
+
+  
   return (
     <div className="App">
       <header className="App-header">
@@ -19,6 +31,7 @@ function App() {
           Learn React
         </a>
       </header>
+      <p>{this.state.response}</p>
     </div>
   );
 }
