@@ -1,39 +1,58 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
+import axios from 'axios';
 import './App.css';
 
-function App() {
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      url: 'https://api.skypicker.com/flights?flyFrom=PRG&to=LGW&dateFrom=18/09/2019&dateTo=12/12/2019&partner=picky',
+      response: ''
+    };
+  }
 
-  const state = {
-    response: ''
-  };
+  onChange = (event) => {
+    this.setState({ url: event.target.value });
+  }
 
-  const handleClick = buttonName => {
+  onClick = () => {
+    console.log('make request to KIWI API')
+    this.setState({
+      response: 'request pending...'
+    });
+    axios.get(this.state.url).then((response) => {
+      console.log('success')
+      console.log(typeof response)
+      this.setState({
+        response: JSON.stringify(response.data, null, 4)
+      });
+    }).catch( (errors) => {
+      console.log('error')
+      console.log(errors)
+      this.setState({
+        response: 'invalid request'
+      });
+      
+    })
+  }
 
-    //TODO make a request
-    //set the response to the state
-  };
+  render() {
+    return (
+      <div>
+          <h1>Request to Kiwi API</h1>
+          <p>Change the url and click on the "Send request" button</p>
 
-  
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-      <p>{this.state.response}</p>
-    </div>
-  );
+          <input value={this.state.url} onChange={this.onChange} size="200" />
+          <button onClick={this.onClick}>Send request</button>
+
+          <pre>
+            <code>
+              {this.state.response}
+            </code>
+          </pre>
+      </div>
+    );
+  }
 }
 
 export default App;
