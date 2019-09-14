@@ -73,7 +73,7 @@ class App extends Component {
             <tbody>
             <tr>
               <th>From Paris</th>
-              <th>From Manchester</th>
+              <th>From Edinburgh</th>
             </tr>
             <tr>
               <td>
