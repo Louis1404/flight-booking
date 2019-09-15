@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import _ from 'lodash';
 import './App.css';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      url1: 'https://api.skypicker.com/flights?fly_type=round&fly_from=city:PAR&to=&direct_flights=1&dateFrom=18/09/2019&dateTo=18/09/2019&return_from=22/09/2019&return_to=22/09/2019&sort=price&partner=picky',
-      url2: 'https://api.skypicker.com/flights?fly_type=round&fly_from=city:EDI&to=&direct_flights=1&dateFrom=18/09/2019&dateTo=18/09/2019&return_from=22/09/2019&return_to=22/09/2019&sort=price&partner=picky',
+      url1: 'https://api.skypicker.com/flights?fly_type=round&fly_from=city:PAR&to=&dateFrom=18/09/2019&dateTo=22/09/2019&return_from=24/09/2019&return_to=28/09/2019&sort=price&partner=picky',
+      url2: 'https://api.skypicker.com/flights?fly_type=round&fly_from=city:MAD&to=&dateFrom=18/09/2019&dateTo=22/09/2019&return_from=24/09/2019&return_to=28/09/2019&sort=price&partner=picky',
       response1: '',
       response2: '',
-      response: ''
+      response: '',
+      intersections: ''
     };
   }
 
@@ -31,33 +33,47 @@ class App extends Component {
     const promise2 = axios.get(this.state.url2);
     const comp = this
     Promise.all([promise1, promise2]).then(function(values) {
-      
+
       const response1 = values[0].data.data.map((item) => {
           return {
-            "price" : item.price,
+            "price": item.price,
             "departure": item.cityFrom,
             "destination": item.cityTo
-          }
+          };
       })
       response1.sort(function(a, b){return a.price - b.price});
 
       const response2 = values[1].data.data.map((item) => {
         return {
-          "price" : item.price,
+          "price": item.price,
           "departure": item.cityFrom,
           "destination": item.cityTo
         }
       })
-      console.log( values[1].data)
       response2.sort(function(a, b){return a.price - b.price});
-    comp.setState({
-      response1: JSON.stringify(response1, null, 4)
-    })
-    comp.setState({
-      response2: JSON.stringify(response2, null, 4)
-    })
-    });
 
+      console.log(response1);
+      console.log(values[1].data);
+
+      const intersection = _.intersectionBy(response1, response2, 'destination');
+      const commonDest = intersection.map((item) => {
+        return {
+          "destination": item.destination
+        };
+      })
+
+      console.log(commonDest);
+
+      comp.setState({
+        response1: JSON.stringify(response1, null, 4)
+      });
+      comp.setState({
+        response2: JSON.stringify(response2, null, 4)
+      });
+      comp.setState({
+        intersections: JSON.stringify(commonDest, null, 4)
+      });
+    });
   }
 
   render() {
@@ -73,7 +89,8 @@ class App extends Component {
             <tbody>
             <tr>
               <th>From Paris</th>
-              <th>From Edinburgh</th>
+              <th>From Madrid</th>
+              <th>Intersections</th>
             </tr>
             <tr>
               <td>
@@ -86,10 +103,15 @@ class App extends Component {
                   <code>{this.state.response2}</code>
                 </pre>
               </td>
+              <td>
+                <pre>
+                  <code>{this.state.intersections}</code>
+                </pre>
+              </td>
             </tr>
             </tbody>
           </table>
-        
+
       </div>
     );
   }
